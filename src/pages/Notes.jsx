@@ -191,9 +191,9 @@ const Notes = () => {
                 <button
                   onClick={() => deleteNote(note.id)}
                   className="bg-red-500 flex justify-center items-center hover:bg-red-600 text-white px-3 py-1 rounded-xl transition-all shadow"
-                  disabled={loading}
+                  disabled={loadingD}
                 >
-                  {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : '  Delete'}
+                  {loadingD ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : '  Delete'}
 
                 </button>
               </div>
