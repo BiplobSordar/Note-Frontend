@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import API from "../api";
 import toast from "react-hot-toast";
@@ -7,58 +8,33 @@ const Notes = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [editingId, setEditingId] = useState(null);
-  const [loadingU, setLoadingU] = useState(false)
-  const [loadingC, setLoadingC] = useState(false)
-  const [loadingD, setLoadingD] = useState(false)
+  const [loadingC, setLoadingC] = useState(false); 
+  const [loadingU, setLoadingU] = useState(false);
+  const [loadingD, setLoadingD] = useState({}); 
 
   const fetchNotes = async () => {
     try {
       const res = await API.get("/notes");
       setNotes(res.data);
     } catch (err) {
-      console.log(err);
-
-
-      if (err.response) {
-
-        console.error("Backend Error", err.response.data);
-        toast.error(err.response.data.message || "Invalid credentials");
-      } else if (err.request) {
-
-        console.error("Network Error", err.message);
-        toast.error("Network error. Please try again.");
-      } else {
-
-        console.error("Error", err.message);
-        toast.error("Something went wrong.");
-      }
+      handleError(err, "Failed to fetch notes");
     }
   };
 
+ 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
-    if (!title || !content) {
-
-      return;
-    }
+    if (!title || !content) return;
 
     try {
-
       if (editingId) {
-
-        loadingU(true)
-
+        setLoadingU(true);
         await API.put(`/notes/${editingId}`, { title, content });
-        setLoadingU(false)
-        toast.success('Note Updated')
-
+        toast.success("Note Updated");
       } else {
-
-        setLoadingC(true)
+        setLoadingC(true);
         await API.post("/notes", { title, content });
-        setLoadingC(false)
-        toast.success('Note Added')
+        toast.success("Note Added");
       }
 
       setTitle("");
@@ -66,57 +42,42 @@ const Notes = () => {
       setEditingId(null);
       fetchNotes();
     } catch (err) {
-      console.log(err);
-      setLoadingU(false)
-      setLoadingC(false)
-
-      if (err.response) {
-
-        console.error("Backend Error", err.response.data);
-        toast.error(err.response.data.message || "Invalid credentials");
-      } else if (err.request) {
-
-        console.error("Network Error", err.message);
-        toast.error("Network error. Please try again.");
-      } else {
-
-        console.error("Error", err.message);
-        toast.error("Something went wrong.");
-      }
+      handleError(err, "Failed to save note");
+    } finally {
+      setLoadingC(false);
+      setLoadingU(false);
     }
   };
 
+  const deleteNote = async (id) => {
+    setLoadingD((prev) => ({ ...prev, [id]: true }));
+    try {
+      await API.delete(`/notes/${id}`);
+      toast.success("Note Deleted");
+      fetchNotes();
+    } catch (err) {
+      handleError(err, "Failed to delete note");
+    } finally {
+      setLoadingD((prev) => ({ ...prev, [id]: false }));
+    }
+  };
+
+ 
   const startEditing = (note) => {
     setEditingId(note.id);
     setTitle(note.title);
     setContent(note.content);
   };
 
-  const deleteNote = async (id) => {
-    setLoadingD(true)
-    try {
-      await API.delete(`/notes/${id}`);
-      toast.success('Note Deleted')
-
-      fetchNotes();
-      setLoadingD(false)
-    } catch (err) {
-      console.log(err);
-      setLoadingD(false)
-
-      if (err.response) {
-
-        console.error("Backend Error", err.response.data);
-        toast.error(err.response.data.message || "Invalid credentials");
-      } else if (err.request) {
-
-        console.error("Network Error", err.message);
-        toast.error("Network error. Please try again.");
-      } else {
-
-        console.error("Error", err.message);
-        toast.error("Something went wrong.");
-      }
+  
+  const handleError = (err, defaultMsg) => {
+    console.error(err);
+    if (err.response) {
+      toast.error(err.response.data.message || defaultMsg);
+    } else if (err.request) {
+      toast.error("Network error. Please try again.");
+    } else {
+      toast.error(defaultMsg);
     }
   };
 
@@ -131,6 +92,7 @@ const Notes = () => {
           My Notes
         </h2>
 
+      
         <form onSubmit={handleSubmit} className="space-y-4 mb-6">
           <div className="relative">
             <input
@@ -163,14 +125,19 @@ const Notes = () => {
           <button
             type="submit"
             disabled={editingId ? loadingU : loadingC}
-            className="w-full flex justify-center items-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+            className="w-full flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
-         
-            {editingId ? loadingU ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : "Update Note" : loadingC ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : "Add Note"}
-
+            {editingId
+              ? loadingU
+                ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                : "Update Note"
+              : loadingC
+              ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              : "Add Note"}
           </button>
         </form>
 
+        
         <ul className="space-y-4">
           {notes.map((note) => (
             <li
@@ -191,10 +158,11 @@ const Notes = () => {
                 <button
                   onClick={() => deleteNote(note.id)}
                   className="bg-red-500 flex justify-center items-center hover:bg-red-600 text-white px-3 py-1 rounded-xl transition-all shadow"
-                  disabled={loadingD}
+                  disabled={loadingD[note.id]}
                 >
-                  {loadingD ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : '  Delete'}
-
+                  {loadingD[note.id]
+                    ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    : "Delete"}
                 </button>
               </div>
             </li>
