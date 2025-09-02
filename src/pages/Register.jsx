@@ -7,33 +7,39 @@ const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
+    setLoading(true)
     e.preventDefault();
-      if(!username&& !password )return
+    if (!username && !password) {
+      setLoading(false)
+      return
+    }
     try {
-      console.log(API)
-      await API.post("/auth/register", { username, password ,email});
+    
+      await API.post("/auth/register", { username, password, email });
+      setLoading(false)
       toast.success('User Register Successfull')
       navigate("/login");
     } catch (err) {
       console.log(err);
+      setLoading(false)
 
-   
-    if (err.response) {
-   
-      console.error("Backend Error", err.response.data);
-      toast.error(err.response.data.message || "Invalid credentials");
-    } else if (err.request) {
-     
-      console.error("Network Error", err.message);
-      toast.error("Network error. Please try again.");
-    } else {
-      
-      console.error("Error", err.message);
-      toast.error("Something went wrong.");
-    }
+      if (err.response) {
+
+        console.error("Backend Error", err.response.data);
+        toast.error(err.response.data.message || "Invalid credentials");
+      } else if (err.request) {
+
+        console.error("Network Error", err.message);
+        toast.error("Network error. Please try again.");
+      } else {
+
+        console.error("Error", err.message);
+        toast.error("Something went wrong.");
+      }
     }
   };
 
@@ -53,10 +59,10 @@ const Register = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              
+
             />
             <label className="absolute left-0 -top-3.5 text-gray-500 text-sm peer-placeholder-shown:top-2 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base transition-all">
-             Email
+              Email
             </label>
           </div>
           <div className="relative">
@@ -89,9 +95,11 @@ const Register = () => {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
           >
-            Register
+            {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : 'Register'}
+
           </button>
         </form>
 

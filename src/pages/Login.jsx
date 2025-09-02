@@ -8,22 +8,30 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
+  const [loading,setLoading]=useState(false)
   const navigate = useNavigate();
 
   
 
 
 const handleSubmit = async (e) => {
+  setLoading(true)
   e.preventDefault();
 
-  if (!username || !password) return;
+  if (!username || !password){
+    setLoading(false)
+ return;
+  }
 
   try {
     const res = await API.post("/auth/login", { username, password });
     login(res.data.token);
+    setLoading(false)
     toast.success("Login Successful");
+    
     navigate("/");
   } catch (err) {
+    setLoading(false)
     console.log(err);
 
    
@@ -81,9 +89,10 @@ const handleSubmit = async (e) => {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
           >
-            Login
+           {loading?  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>:'Login'} 
           </button>
         </form>
 

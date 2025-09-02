@@ -6,7 +6,8 @@ const Notes = () => {
   const [notes, setNotes] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [editingId, setEditingId] = useState(null); 
+  const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(false)
 
   const fetchNotes = async () => {
     try {
@@ -15,20 +16,20 @@ const Notes = () => {
     } catch (err) {
       console.log(err);
 
-   
-    if (err.response) {
-   
-      console.error("Backend Error", err.response.data);
-      toast.error(err.response.data.message || "Invalid credentials");
-    } else if (err.request) {
-     
-      console.error("Network Error", err.message);
-      toast.error("Network error. Please try again.");
-    } else {
-      
-      console.error("Error", err.message);
-      toast.error("Something went wrong.");
-    }
+
+      if (err.response) {
+
+        console.error("Backend Error", err.response.data);
+        toast.error(err.response.data.message || "Invalid credentials");
+      } else if (err.request) {
+
+        console.error("Network Error", err.message);
+        toast.error("Network error. Please try again.");
+      } else {
+
+        console.error("Error", err.message);
+        toast.error("Something went wrong.");
+      }
     }
   };
 
@@ -38,36 +39,36 @@ const Notes = () => {
 
     try {
       if (editingId) {
-      
+
         await API.put(`/notes/${editingId}`, { title, content });
         toast.success('Note Updated')
       } else {
-       
+
         await API.post("/notes", { title, content });
-         toast.success('Note Added')
+        toast.success('Note Added')
       }
 
       setTitle("");
       setContent("");
-      setEditingId(null); 
+      setEditingId(null);
       fetchNotes();
     } catch (err) {
-     console.log(err);
+      console.log(err);
 
-   
-    if (err.response) {
-   
-      console.error("Backend Error", err.response.data);
-      toast.error(err.response.data.message || "Invalid credentials");
-    } else if (err.request) {
-     
-      console.error("Network Error", err.message);
-      toast.error("Network error. Please try again.");
-    } else {
-      
-      console.error("Error", err.message);
-      toast.error("Something went wrong.");
-    }
+
+      if (err.response) {
+
+        console.error("Backend Error", err.response.data);
+        toast.error(err.response.data.message || "Invalid credentials");
+      } else if (err.request) {
+
+        console.error("Network Error", err.message);
+        toast.error("Network error. Please try again.");
+      } else {
+
+        console.error("Error", err.message);
+        toast.error("Something went wrong.");
+      }
     }
   };
 
@@ -83,22 +84,22 @@ const Notes = () => {
       toast.success('Note Deleted')
       fetchNotes();
     } catch (err) {
-     console.log(err);
+      console.log(err);
 
-   
-    if (err.response) {
-   
-      console.error("Backend Error", err.response.data);
-      toast.error(err.response.data.message || "Invalid credentials");
-    } else if (err.request) {
-     
-      console.error("Network Error", err.message);
-      toast.error("Network error. Please try again.");
-    } else {
-      
-      console.error("Error", err.message);
-      toast.error("Something went wrong.");
-    }
+
+      if (err.response) {
+
+        console.error("Backend Error", err.response.data);
+        toast.error(err.response.data.message || "Invalid credentials");
+      } else if (err.request) {
+
+        console.error("Network Error", err.message);
+        toast.error("Network error. Please try again.");
+      } else {
+
+        console.error("Error", err.message);
+        toast.error("Something went wrong.");
+      }
     }
   };
 
@@ -144,9 +145,10 @@ const Notes = () => {
 
           <button
             type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+            className="w-full flex justify-center items-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
           >
-            {editingId ? "Update Note" : "Add Note"}
+            {/* {editingId ? "Update Note" : "Add Note"} */}
+            {editingId ? loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : "Update Note" : loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : "Add Note"}
           </button>
         </form>
 
