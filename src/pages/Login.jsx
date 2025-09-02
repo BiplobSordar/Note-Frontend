@@ -90,7 +90,7 @@ const handleSubmit = async (e) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+            className="w-full flex justify-center items-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
           >
            {loading?  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>:'Login'} 
           </button>

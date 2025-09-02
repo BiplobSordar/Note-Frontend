@@ -34,17 +34,24 @@ const Notes = () => {
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true)
     e.preventDefault();
-    if (!title || !content) return;
+    if (!title || !content) {
+      setLoading(false)
+      return;
+    }
 
     try {
       if (editingId) {
 
         await API.put(`/notes/${editingId}`, { title, content });
+        setLoading(false)
         toast.success('Note Updated')
+
       } else {
 
         await API.post("/notes", { title, content });
+        setLoading(false)
         toast.success('Note Added')
       }
 
@@ -54,7 +61,7 @@ const Notes = () => {
       fetchNotes();
     } catch (err) {
       console.log(err);
-
+      setLoading(false)
 
       if (err.response) {
 
@@ -79,13 +86,16 @@ const Notes = () => {
   };
 
   const deleteNote = async (id) => {
+    setLoading(true)
     try {
       await API.delete(`/notes/${id}`);
       toast.success('Note Deleted')
+
       fetchNotes();
+      setLoading(false)
     } catch (err) {
       console.log(err);
-
+      setLoading(false)
 
       if (err.response) {
 
@@ -145,6 +155,7 @@ const Notes = () => {
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full flex justify-center items-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
           >
             {/* {editingId ? "Update Note" : "Add Note"} */}
@@ -171,9 +182,11 @@ const Notes = () => {
                 </button>
                 <button
                   onClick={() => deleteNote(note.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-xl transition-all shadow"
+                  className="bg-red-500 flex justify-center items-center hover:bg-red-600 text-white px-3 py-1 rounded-xl transition-all shadow"
+                  disabled={loading}
                 >
-                  Delete
+                  {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : '  Delete'}
+
                 </button>
               </div>
             </li>
