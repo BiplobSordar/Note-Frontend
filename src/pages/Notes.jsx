@@ -7,7 +7,9 @@ const Notes = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [editingId, setEditingId] = useState(null);
-  const [loading, setLoading] = useState(false)
+  const [loadingU, setLoadingU] = useState(false)
+  const [loadingC, setLoadingC] = useState(false)
+  const [loadingD, setLoadingD] = useState(false)
 
   const fetchNotes = async () => {
     try {
@@ -34,24 +36,28 @@ const Notes = () => {
   };
 
   const handleSubmit = async (e) => {
-    setLoading(true)
+
     e.preventDefault();
     if (!title || !content) {
-      setLoading(false)
+
       return;
     }
 
     try {
+
       if (editingId) {
 
+        loadingU(true)
+
         await API.put(`/notes/${editingId}`, { title, content });
-        setLoading(false)
+        setLoadingU(false)
         toast.success('Note Updated')
 
       } else {
 
+        setLoadingC(true)
         await API.post("/notes", { title, content });
-        setLoading(false)
+        setLoadingC(false)
         toast.success('Note Added')
       }
 
@@ -61,7 +67,8 @@ const Notes = () => {
       fetchNotes();
     } catch (err) {
       console.log(err);
-      setLoading(false)
+      setLoadingU(false)
+      setLoadingC(false)
 
       if (err.response) {
 
@@ -86,16 +93,16 @@ const Notes = () => {
   };
 
   const deleteNote = async (id) => {
-    setLoading(true)
+    setLoadingD(true)
     try {
       await API.delete(`/notes/${id}`);
       toast.success('Note Deleted')
 
       fetchNotes();
-      setLoading(false)
+      setLoadingD(false)
     } catch (err) {
       console.log(err);
-      setLoading(false)
+      setLoadingD(false)
 
       if (err.response) {
 
@@ -155,11 +162,12 @@ const Notes = () => {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={editingId ? loadingU : loadingC}
             className="w-full flex justify-center items-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
           >
-            {/* {editingId ? "Update Note" : "Add Note"} */}
-            {editingId ? loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : "Update Note" : loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : "Add Note"}
+         
+            {editingId ? loadingU ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : "Update Note" : loadingC ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : "Add Note"}
+
           </button>
         </form>
 
