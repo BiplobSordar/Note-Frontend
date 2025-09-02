@@ -96,7 +96,7 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+            className="w-full flex justify-center items-center bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
           >
             {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : 'Register'}
 
